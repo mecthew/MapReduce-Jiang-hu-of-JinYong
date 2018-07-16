@@ -16,10 +16,13 @@ import java.text.DecimalFormat;
 import java.util.StringTokenizer;
 
 public class PageRanklter {
-    private static final double damping = 0.85;
-    private static final double number = 0.001;
+//    private static final double damping = 0.85;
+//    private static final double number = 0.001;
 
     public static class PRlterMapper extends Mapper<LongWritable, Text, Text, Text> {
+        /*
+        输入格式：
+         */
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             StringTokenizer itr = new StringTokenizer(value.toString(), "\t");
@@ -31,7 +34,7 @@ public class PageRanklter {
             StringTokenizer nameItr = new StringTokenizer(nameList, ";");
             while(nameItr.hasMoreTokens()){
                 String[] element = nameItr.nextToken().split(":"); //第一个元素为人名，第二个元素为归一化的权值
-                Double PRValue = number*(1-damping)+damping*Double.parseDouble(element[1])*PR;
+                Double PRValue = Double.parseDouble(element[1])*PR;
                 BigDecimal bigDecimal = BigDecimal.valueOf(PRValue);
                 DecimalFormat decimalFormat = new DecimalFormat("0.00000");
                 context.write(new Text(element[0]), new Text(decimalFormat.format(bigDecimal)));

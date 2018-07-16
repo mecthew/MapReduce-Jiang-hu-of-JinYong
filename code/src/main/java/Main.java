@@ -21,13 +21,13 @@ public class Main {
             }
 
             try {
-                Job extractJob = Extracter.getJob(args[1], "name", args[3]);
+                Job extractJob = Extracter.getJob(args[1], args[2]+"/name", args[3]);
                 extractJob.waitForCompletion(true);
 
-                Job countJob = Counter.getJob("name", "count");
+                Job countJob = Counter.getJob(args[2]+"/name", args[2]+"/count");
                 countJob.waitForCompletion(true);
 
-                Job buildJob = Builder.getJob("count", args[2]);
+                Job buildJob = Builder.getJob(args[2]+"/count", args[2]+"/build");
                 buildJob.waitForCompletion(true);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -63,33 +63,41 @@ public class Main {
                 System.exit(-1);
             }
             try {
-                Job extractJob = Extracter.getJob(args[0], "name", args[2]);
+                long time0 = System.currentTimeMillis();
+                Job extractJob = Extracter.getJob(args[0], args[1]+"/name", args[2]);
                 extractJob.waitForCompletion(true);
+                long time1 = System.currentTimeMillis();
 
-                Job countJob = Counter.getJob("name", "count");
+                Job countJob = Counter.getJob(args[1]+"/name", args[1]+"/count");
                 countJob.waitForCompletion(true);
+                long time2 = System.currentTimeMillis();
 
-                Job buildJob = Builder.getJob("count", args[1]);
+                Job buildJob = Builder.getJob(args[1]+"/count", args[1]+"/build");
                 buildJob.waitForCompletion(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                long time3 = System.currentTimeMillis();
 
+                String arg2 = args[3];
+                if (arg2.charAt(arg2.length() - 1) != '/') arg2 = arg2 + "/";
 
-
-            String arg2 = args[3];
-            if (arg2.charAt(arg2.length() - 1) != '/') arg2 = arg2 + "/";
-
-            try {
-                String[] forPR = {args[1], arg2 + "PR", prInterval.toString()};
+                String[] forPR = {args[1]+"/build", arg2 + "PR", prInterval.toString()};
                 pagerank.PageRankDriver.main(forPR);
+                long time4 = System.currentTimeMillis();
                 //Usage: PageRanker.jar <inPath> <outPath> <cycleNumber>
                 //inPath is readNovelOutput，格式name 0.1#n1:w1;n2:w2;n3:w3
 
                 String[] forLPA = {arg2 + "PR/Data" + prInterval.toString(), arg2 + "LPA", lpaInterval.toString()};
                 lpa.LPADriver.main(forLPA);
+                long time5 = System.currentTimeMillis();
                 //Usage: LabelPropagation.jar <inPath> <outPath> <cycleNumber>
 
+
+                long TotalDiff = time5-time0;
+                System.out.println(time1-time0);
+                System.out.println(time2-time1);
+                System.out.println(time3-time2);
+                System.out.println(time4-time3);
+                System.out.println(time5-time4);
+                System.out.println(time5-time0);
             } catch (Exception e) { e.printStackTrace(); }
 
         }
